@@ -86,7 +86,7 @@ function PaymentPage() {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/bookings",
+        "/api/bookings",
         {
           method: "POST",
           headers: {

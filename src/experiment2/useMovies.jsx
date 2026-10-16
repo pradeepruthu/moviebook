@@ -1,7 +1,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 
-const MOVIE_API = "http://localhost:5000/api/movies";
+const MOVIE_API = "/api/movies";
 
 function useMovies() {
   const [movies, setMovies] = useState([]);

@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
   async function login(email, password) {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/auth/login",
+        "/api/auth/login",
         {
           method: "POST",
           headers: {
