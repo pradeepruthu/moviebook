@@ -1,6 +1,8 @@
+
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "./AuthContext";
+
 function Login() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -9,18 +11,26 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const from = location.state?.from?.pathname || "/movies";
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault();
 
-    const success = login(email, password);
+    setLoading(true);
 
-    if (success) {
-      navigate(from, { replace: true });
-    } else {
-      alert("Please enter email and password");
+    try {
+      const success = await login(email, password);
+
+      if (success) {
+        navigate(from, { replace: true });
+      }
+    } catch (error) {
+      console.error("Login failed:", error);
+      alert("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -37,6 +47,7 @@ function Login() {
             onChange={(event) => setEmail(event.target.value)}
             required
           />
+
           <input
             type="password"
             placeholder="Enter password"
@@ -44,10 +55,14 @@ function Login() {
             onChange={(event) => setPassword(event.target.value)}
             required
           />
-          <button type="submit">Login</button>
+
+          <button type="submit" disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
+          </button>
         </form>
       </div>
     </section>
   );
 }
+
 export default Login;

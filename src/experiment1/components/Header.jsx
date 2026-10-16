@@ -5,12 +5,10 @@ import { useAuth } from "../../experiment4/AuthContext";
 function Header() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-
   function handleLogout() {
     logout();
     navigate("/");
   }
-
   return (
     <header className="header">
       <h1 className="logo">CineBook</h1>

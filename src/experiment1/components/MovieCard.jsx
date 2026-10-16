@@ -7,7 +7,7 @@ function MovieCard({ movie }) {
     <div className="movie-card">
       <div className="movie-content">
         <h3>{movie.title}</h3>
-        <p>Genre: {movie.genre}</p>
+        <p>Genre:{movie.genre.join(", ")}</p>
         <p>Language: {movie.language}</p>
         <p> {movie.rating}</p>
         <button onClick={() => navigate(`/movie/${movie.id}`)}>

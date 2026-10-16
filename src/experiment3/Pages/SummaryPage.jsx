@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -39,8 +40,8 @@ function SummaryPage() {
     }
 
     setCustomer({
-      name: name,
-      email: email,
+      name: name.trim(),
+      email: email.trim(),
     });
 
     navigate("/booking/payment");
@@ -80,7 +81,7 @@ function SummaryPage() {
           onChange={(event) => setEmail(event.target.value)}
         />
 
-        <button onClick={continueToPayment}>
+        <button type="button" onClick={continueToPayment}>
           Continue to Payment
         </button>
       </div>

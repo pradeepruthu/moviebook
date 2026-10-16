@@ -6,7 +6,7 @@
 
 body {
   font-family: "Poppins", Arial, sans-serif;
-  background: radial-gradient(circle at top, #393927, #d3b8fb81 70%);
+  background:rgb(86, 65, 50);
   color: #f5f5ff;
   min-height: 100vh;
 }

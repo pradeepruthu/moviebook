@@ -1,29 +1,17 @@
-import React, { useState } from "react";
 
-const theatres = [
-  {
-    id: 1,
-    name: "PVR Cinemas",
-    location: "Trichy",
-  },
-  {
-    id: 2,
-    name: "INOX Cinemas",
-    location: "Chennai",
-  },
-  {
-    id: 3,
-    name: "Kannan Theatre",
-    location: "Madurai",
-  },
-];
+import React from "react";
 
-function TheatreList({ onSelect }) {
-  const [selectedTheatre, setSelectedTheatre] = useState(null);
-
+function TheatreList({
+  theatres = [],
+  selectedTheatre,
+  onSelect,
+}) {
   function handleSelect(theatre) {
-    setSelectedTheatre(theatre.id);
     onSelect(theatre);
+  }
+
+  if (theatres.length === 0) {
+    return <p>No theatres available.</p>;
   }
 
   return (
@@ -31,7 +19,9 @@ function TheatreList({ onSelect }) {
       {theatres.map((theatre) => (
         <div
           className={`theatre-card ${
-            selectedTheatre === theatre.id ? "selected-theatre" : ""
+            selectedTheatre?.id === theatre.id
+              ? "selected-theatre"
+              : ""
           }`}
           key={theatre.id}
         >
@@ -39,8 +29,11 @@ function TheatreList({ onSelect }) {
 
           <p>Location: {theatre.location}</p>
 
-          <button onClick={() => handleSelect(theatre)}>
-            {selectedTheatre === theatre.id
+          <button
+            type="button"
+            onClick={() => handleSelect(theatre)}
+          >
+            {selectedTheatre?.id === theatre.id
               ? "Selected Theatre"
               : "Select Theatre"}
           </button>

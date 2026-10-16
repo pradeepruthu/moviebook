@@ -1,3 +1,4 @@
+
 import { useState, useMemo, useCallback } from "react";
 
 function useBooking() {
@@ -12,10 +13,14 @@ function useBooking() {
   });
 
   const [confirmedBooking, setConfirmedBooking] = useState(null);
-  const [bookedSeats, setBookedSeats] = useState(() => {
-    const savedSeats = localStorage.getItem("bookedSeats");
 
-    return savedSeats ? JSON.parse(savedSeats) : {};
+  const [bookedSeats, setBookedSeats] = useState(() => {
+    try {
+      const savedSeats = localStorage.getItem("bookedSeats");
+      return savedSeats ? JSON.parse(savedSeats) : {};
+    } catch {
+      return {};
+    }
   });
 
   const selectMovie = useCallback((movie) => {
@@ -32,6 +37,7 @@ function useBooking() {
     setSelectedShow(show);
     setSelectedSeats([]);
   }, []);
+
   const getShowKey = useCallback(() => {
     if (!selectedMovie || !selectedTheatre || !selectedShow) {
       return null;
@@ -39,35 +45,40 @@ function useBooking() {
 
     return `${selectedMovie.id}-${selectedTheatre.id}-${selectedShow.id}`;
   }, [selectedMovie, selectedTheatre, selectedShow]);
+
   const toggleSeat = useCallback(
     (seat) => {
       const showKey = getShowKey();
 
-      if (!showKey) {
-        return;
-      }
-      if (bookedSeats[showKey]?.includes(seat)) {
+      if (!showKey || bookedSeats[showKey]?.includes(seat)) {
         return;
       }
 
-      setSelectedSeats((previousSeats) => {
-        if (previousSeats.includes(seat)) {
-          return previousSeats.filter((item) => item !== seat);
-        }
-
-        return [...previousSeats, seat];
-      });
+      setSelectedSeats((previousSeats) =>
+        previousSeats.includes(seat)
+          ? previousSeats.filter((item) => item !== seat)
+          : [...previousSeats, seat]
+      );
     },
     [getShowKey, bookedSeats]
   );
 
+  // Calculate total using the selected show price.
   const total = useMemo(() => {
-    if (!selectedShow) {
+    const price = Number(selectedShow?.price);
+
+    if (
+      !selectedShow ||
+      selectedSeats.length === 0 ||
+      !Number.isFinite(price) ||
+      price <= 0
+    ) {
       return 0;
     }
 
-    return selectedSeats.length * selectedShow.price;
+    return selectedSeats.length * price;
   }, [selectedSeats, selectedShow]);
+
   const confirmBooking = useCallback(
     (paymentMethod) => {
       const showKey = getShowKey();
@@ -84,24 +95,26 @@ function useBooking() {
       };
 
       setConfirmedBooking(bookingDetails);
-      setBookedSeats((previousBookedSeats) => {
-        const existingSeats = previousBookedSeats[showKey] || [];
 
-        const updatedSeats = [
-          ...new Set([...existingSeats, ...selectedSeats]),
-        ];
+      if (showKey && selectedSeats.length > 0) {
+        setBookedSeats((previousBookedSeats) => {
+          const existingSeats = previousBookedSeats[showKey] || [];
 
-        const newBookedSeats = {
-          ...previousBookedSeats,
-          [showKey]: updatedSeats,
-        };
-        localStorage.setItem(
-          "bookedSeats",
-          JSON.stringify(newBookedSeats)
-        );
+          const newBookedSeats = {
+            ...previousBookedSeats,
+            [showKey]: [
+              ...new Set([...existingSeats, ...selectedSeats]),
+            ],
+          };
 
-        return newBookedSeats;
-      });
+          localStorage.setItem(
+            "bookedSeats",
+            JSON.stringify(newBookedSeats)
+          );
+
+          return newBookedSeats;
+        });
+      }
     },
     [
       getShowKey,

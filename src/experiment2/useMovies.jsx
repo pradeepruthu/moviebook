@@ -1,120 +1,95 @@
+
 import { useState, useEffect, useMemo, useCallback } from "react";
 
-const movieData = [
-
- {
-
-   id: 1,
-
-  title: "Leo",
-
-   genre: "Action",
-
-   language: "Tamil",
-
-   rating: 4.5,
-   duration: "2h 44m",
-
- },
-
- {
-
-    id: 2,
-
-    title: "Vikram",
-
-    genre: "Thriller",
-
-    language: "Tamil",
-
-    rating: 4.8,
-
-    duration: "2h 55m",
-
-  },
-
-  {
-
-    id: 3,
-
-    title: "Interstellar",
-
-    genre: "Sci-Fi",
-
- language: "English",
-
-rating: 4.7,
-
-duration: "2h 49m",
-
- },
-
-{
-
-    id: 4,
-
-    title: "Jailer",
-
-    genre: "Action",
-
-    language: "Tamil",
-
-    rating: 4.3,
-
-    duration: "2h 48m",
-
-  },
-
-];
+const MOVIE_API = "http://localhost:5000/api/movies";
 
 function useMovies() {
+  const [movies, setMovies] = useState([]);
+  const [search, setSearch] = useState("");
+  const [genre, setGenre] = useState("All");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const [movies, setMovies] = useState([]);
+  const fetchMovies = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-  const [search, setSearch] = useState("");
+      const response = await fetch(MOVIE_API);
 
-  useEffect(() => {
+      if (!response.ok) {
+        throw new Error("Failed to fetch movies");
+      }
 
-    setMovies(movieData);
+      const data = await response.json();
 
-  }, []);
+      const formattedMovies = data.map((movie) => ({
+        id: movie.id,
+        title: movie.title || movie.name || "Untitled",
+        description: movie.description || "No description available",
+        genre: Array.isArray(movie.genre)
+          ? movie.genre
+          : [movie.genre || "Other"],
+        language: movie.language || "Unknown",
+        rating: movie.rating || 0,
+        duration: movie.duration || "Unknown",
+        image: movie.image || "",
+      }));
 
-  const filteredMovies = useMemo(() => {
+      setMovies(formattedMovies);
+    } catch (err) {
+      console.error("Movie API Error:", err);
+      setError(err.message || "Failed to fetch movies");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    return movies.filter((movie) =>
+  useEffect(() => {
+    fetchMovies();
+  }, [fetchMovies]);
 
-      movie.title.toLowerCase().includes(search.toLowerCase())
+  const filteredMovies = useMemo(() => {
+    return movies.filter((movie) => {
+      const matchesSearch = movie.title
+        .toLowerCase()
+        .includes(search.trim().toLowerCase());
 
-    );
+      const matchesGenre =
+        genre === "All" || movie.genre.includes(genre);
 
-  }, [movies, search]);
+      return matchesSearch && matchesGenre;
+    });
+  }, [movies, search, genre]);
 
-  const findMovie = useCallback(
+  const findMovie = useCallback(
+    (id) => movies.find((movie) => String(movie.id) === String(id)),
+    [movies]
+  );
 
-    (id) => {
+  const genres = useMemo(() => {
+    const allGenres = movies.flatMap((movie) => movie.genre);
 
-      return movies.find((movie) => movie.id === Number(id));
+    return ["All", ...new Set(allGenres)].sort((a, b) => {
+      if (a === "All") return -1;
+      if (b === "All") return 1;
+      return a.localeCompare(b);
+    });
+  }, [movies]);
 
-    },
-
-    [movies]
-
-  );
-
-  return {
-
-    movies,
-
-    search,
-
-    setSearch,
-
-    filteredMovies,
-
-    findMovie,
-
-  };
-
+  return {
+    movies,
+    search,
+    setSearch,
+    genre,
+    setGenre,
+    genres,
+    filteredMovies,
+    findMovie,
+    loading,
+    error,
+    fetchMovies,
+  };
 }
 
 export default useMovies;
