@@ -4,11 +4,13 @@
   "version": "1.0.0",
   "description": "CineBook Backend API",
   "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+"scripts": {
+  "dev": "vite",
+  "build": "vite build",
+  "lint": "eslint .",
+  "preview": "vite preview",
+  "deploy": "npm run build && gh-pages -d dist"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
