@@ -5,11 +5,11 @@ import { Routes, Route } from "react-router-dom";
 import Header from "../experiment1/components/Header";
 import Footer from "../experiment1/components/Footer";
 
-import HomePage from "./pages/HomePage";
-import MoviesPage from "./pages/MoviesPage";
-import MovieDetailsPage from "./pages/MovieDetailsPage";
+import HomePage from "./Pages/HomePage";
+import MoviesPage from "./Pages/MoviesPage";
+import MovieDetailsPage from "./Pages/MovieDetailsPage";
 import TheatrePage from "./Pages/TheatrePage";
-import SeatsPage from "./pages/SeatsPage";
+import SeatsPage from "./Pages/SeatsPage";
 import SummaryPage from "./Pages/SummaryPage";
 import PaymentPage from "./Pages/PaymentPage";
 import BookedPage from "./Pages/BookedPage";
